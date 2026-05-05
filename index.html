@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotizaciones Venezuela — Wawa</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple:       #3B1D6E;
+    --purple-mid:   #5A3DA0;
+    --purple-light: #EDE9FF;
+    --amber:        #F5A623;
+    --amber-light:  #FEF3DC;
+    --white:        #FFFFFF;
+    --gray-50:      #F8F7FC;
+    --gray-100:     #F0EEF8;
+    --gray-text:    #6B6880;
+    --green:        #1A7A3C;
+    --green-light:  #E6F4EC;
+    --yellow:       #92600A;
+    --yellow-light: #FFF8E6;
+    --red:          #B91C1C;
+    --red-light:    #FEF2F2;
+    --blue:         #1E5FA5;
+    --blue-light:   #EFF6FF;
+    --border:       #E8E4F5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: #1A1533;
+    min-height: 100vh;
+    padding: 32px 24px 64px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--purple);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: rgba(245,166,35,0.08);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: 80px;
+    width: 140px; height: 140px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .header-meta {
+    margin-top: 10px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-meta span { display: flex; align-items: center; gap: 5px; }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #4ADE80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  /* ── KPI CARDS ── */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .kpi {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 20px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .kpi:hover { transform: translateY(-2px); }
+  .kpi-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .kpi.total .kpi-accent { background: var(--purple); }
+  .kpi.ok .kpi-accent    { background: var(--green); }
+  .kpi.blk .kpi-accent   { background: var(--red); }
+  .kpi.pend .kpi-accent  { background: var(--blue); }
+  .kpi-num {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1;
+    margin: 8px 0 6px;
+  }
+  .kpi.total .kpi-num { color: var(--purple); }
+  .kpi.ok .kpi-num    { color: var(--green); }
+  .kpi.blk .kpi-num   { color: var(--red); }
+  .kpi.pend .kpi-num  { color: var(--blue); }
+  .kpi-label { font-size: 12px; color: var(--gray-text); font-weight: 400; }
+
+  /* ── SECTION TITLE ── */
+  .sec-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--gray-100);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 7px 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray-text);
+    border: none;
+    background: transparent;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: var(--white);
+    color: var(--purple);
+    box-shadow: 0 1px 4px rgba(59,29,110,0.12);
+  }
+
+  /* ── CUADROS DINÁMICOS ── */
+  .cuadros { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .cuadro {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .cuadro-head {
+    background: var(--purple);
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .cuadro table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .cuadro thead th {
+    background: var(--gray-50);
+    padding: 8px 12px;
+    text-align: right;
+    font-weight: 500;
+    font-size: 11px;
+    color: var(--gray-text);
+    border-bottom: 1px solid var(--border);
+  }
+  .cuadro thead th:first-child { text-align: left; }
+  .cuadro tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .cuadro tbody td:first-child {
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: #1A1533;
+    font-size: 12px;
+  }
+  .cuadro tbody tr:last-child td {
+    background: var(--purple-light);
+    color: var(--purple);
+    font-weight: 600;
+    border-bottom: none;
+  }
+  .cuadro tbody tr:hover:not(:last-child) td { background: var(--gray-50); }
+  .n-ep   { color: var(--yellow); }
+  .n-ok   { color: var(--green); }
+  .n-pend { color: var(--blue); }
+  .n-blk  { color: var(--red); }
+  .n-tot  { color: var(--purple); font-weight: 600; }
+
+  /* ── ALERTAS ── */
+  .alertas { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+  .alerta {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+  .alerta.roja  { background: var(--red-light);    border-color: #FECACA; }
+  .alerta.amber { background: var(--yellow-light);  border-color: #FDE68A; }
+  .alerta-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .alerta.roja  .alerta-dot { background: var(--red); }
+  .alerta.amber .alerta-dot { background: #D97706; }
+  .alerta-titulo { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+  .alerta.roja  .alerta-titulo { color: var(--red); }
+  .alerta.amber .alerta-titulo { color: var(--yellow); }
+  .alerta-texto { font-size: 12px; color: var(--gray-text); line-height: 1.5; }
+
+  /* ── TABLA DETALLE ── */
+  .tabla-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .tabla-toolbar {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .tabla-toolbar-title { font-size: 13px; font-weight: 600; color: #1A1533; }
+  .filtros { display: flex; gap: 6px; }
+  .filtro-btn {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--gray-text);
+    transition: all 0.12s;
+  }
+  .filtro-btn:hover, .filtro-btn.active { background: var(--purple); color: #fff; border-color: var(--purple); }
+  table.detalle { width: 100%; border-collapse: collapse; }
+  table.detalle thead th {
+    background: var(--purple);
+    color: rgba(255,255,255,0.85);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  table.detalle tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    vertical-align: middle;
+  }
+  table.detalle tbody tr:last-child td { border-bottom: none; }
+  table.detalle tbody tr:hover td { background: var(--gray-50); }
+  .cuenta-name { font-weight: 600; font-size: 13px; color: #1A1533; }
+  .tipo-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 500;
+    background: var(--purple-light);
+    color: var(--purple-mid);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .b-ep   { background: var(--yellow-light); color: var(--yellow); }
+  .b-ok   { background: var(--green-light);  color: var(--green); }
+  .b-pend { background: var(--blue-light);   color: var(--blue); }
+  .b-blk  { background: var(--red-light);    color: var(--red); }
+  .b-alta { background: var(--red-light);    color: var(--red); }
+  .b-media{ background: var(--yellow-light); color: var(--yellow); }
+  .b-baja { background: var(--green-light);  color: var(--green); }
+  .bloqueo-si  { color: var(--red);   font-weight: 600; font-size: 13px; }
+  .bloqueo-no  { color: var(--green); font-size: 13px; }
+  .accion-text { font-size: 11px; color: var(--gray-text); line-height: 1.4; max-width: 220px; }
+
+  /* ── HISTORIAL ── */
+  .historial { display: flex; flex-direction: column; gap: 0; }
+  .hist-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    animation: fadeIn 0.2s ease;
+  }
+  .hist-item:last-child { border-bottom: none; }
+  .hist-fecha {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-text);
+    white-space: nowrap;
+    padding-top: 1px;
+    min-width: 80px;
+  }
+  .hist-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .hist-cuenta { font-weight: 600; font-size: 13px; color: #1A1533; margin-bottom: 2px; }
+  .hist-cambio { font-size: 12px; color: var(--purple-mid); font-weight: 500; margin-bottom: 2px; }
+  .hist-detalle { font-size: 11px; color: var(--gray-text); }
+
+  /* ── PANEL VIEWS ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── EDITABLE ── */
+  [contenteditable] { outline: none; cursor: text; }
+  [contenteditable]:focus {
+    background: var(--purple-light);
+    border-radius: 4px;
+    padding: 1px 4px;
+    outline: 2px solid var(--purple-mid);
+  }
+  select.inline-sel {
+    border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; cursor: pointer;
+    color: inherit; width: auto;
+    padding: 2px 4px;
+    border-radius: 20px;
+  }
+  select.inline-sel:focus { outline: 1px solid var(--purple); border-radius: 4px; }
+
+.tipo-com { display:inline-block; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:500; }
+  .tc-iniciativa { background:#EDE9FF; color:#5A3DA0; }
+  .tc-bloqueo    { background:#FEF2F2; color:#B91C1C; }
+  .tc-seguimiento{ background:#FFF8E6; color:#92600A; }
+  .tc-info       { background:#EFF6FF; color:#1E5FA5; }
+  .add-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px;
+    background: var(--purple);
+    color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: var(--purple-mid); }
+
+  @media (max-width: 768px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .cuadros { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">Wawa · Operaciones Comerciales</div>
+  <h1>Tracker de Cotizaciones<br>Venezuela</h1>
+  <div class="header-meta">
+    <span><span class="live-dot"></span> En tiempo real</span>
+    <span>Semana del 5 de Mayo, 2026</span>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi total">
+    <div class="kpi-accent"></div>
+    <div class="kpi-label">Total cuentas</div>
+    <div class="kpi-num" id="k-total">10</div>
+  </div>
+  <div class="kpi ok">
+    <div class="kpi-accent"></div>
+    <div class="kpi-label">Entregadas</div>
+    <div class="kpi-num" id="k-ok">0</div>
+  </div>
+  <div class="kpi blk">
+    <div class="kpi-accent"></div>
+    <div class="kpi-label">Con bloqueo</div>
+    <div class="kpi-num" id="k-blk">0</div>
+  </div>
+  <div class="kpi pend">
+    <div class="kpi-accent"></div>
+    <div class="kpi-label">Pendientes</div>
+    <div class="kpi-num" id="k-pend">0</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('detalle')">Detalle</button>
+  <button class="tab" onclick="showTab('cuadros')">Cuadro dinámico</button>
+  <button class="tab" onclick="showTab('comentarios')">Comentarios e iniciativas</button>
+  <button class="tab" onclick="showTab('historial')">Historial</button>
+</div>
+
+<!-- DETALLE -->
+<div class="panel active" id="panel-detalle">
+  <div class="tabla-wrap">
+    <div class="tabla-toolbar">
+      <div class="tabla-titulo">Cotizaciones activas</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="filtros">
+          <button class="filtro-btn active" onclick="filtrar('todos',this)">Todas</button>
+          <button class="filtro-btn" onclick="filtrar('En proceso',this)">En proceso</button>
+          <button class="filtro-btn" onclick="filtrar('Entregada',this)">Entregadas</button>
+          <button class="filtro-btn" onclick="filtrar('Bloqueada',this)">Bloqueadas</button>
+          <button class="filtro-btn" onclick="filtrar('Pendiente',this)">Pendientes</button>
+        </div>
+        <button class="add-btn" onclick="addRow()">+ Agregar</button>
+      </div>
+    </div>
+    <table class="detalle">
+      <thead>
+        <tr>
+          <th>Cuenta</th>
+          <th>Tipo</th>
+          <th>Fecha solicitud</th>
+          <th>Fecha entrega</th>
+          <th>Responsable</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Bloqueo</th>
+          <th>Acción requerida</th>
+          <th>Comentarios / Iniciativas</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-detalle"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CUADROS -->
+<div class="panel" id="panel-cuadros">
+  <div class="cuadros">
+    <div class="cuadro">
+      <div class="cuadro-head">Por responsable</div>
+      <table>
+        <thead><tr>
+          <th>Responsable</th>
+          <th class="n-ep">En proc.</th>
+          <th class="n-ok">Entregada</th>
+          <th class="n-pend">Pendiente</th>
+          <th class="n-blk">Bloqueada</th>
+          <th class="n-tot">Total</th>
+        </tr></thead>
+        <tbody id="tb-resp"></tbody>
+      </table>
+    </div>
+    <div class="cuadro">
+      <div class="cuadro-head">Por prioridad</div>
+      <table>
+        <thead><tr>
+          <th>Prioridad</th>
+          <th class="n-ep">En proc.</th>
+          <th class="n-ok">Entregada</th>
+          <th class="n-pend">Pendiente</th>
+          <th class="n-blk">Bloqueada</th>
+          <th class="n-tot">Total</th>
+        </tr></thead>
+        <tbody id="tb-prio"></tbody>
+      </table>
+    </div>
+    <div class="cuadro">
+      <div class="cuadro-head">Por tipo de cotización</div>
+      <table>
+        <thead><tr>
+          <th>Tipo</th>
+          <th class="n-ep">En proc.</th>
+          <th class="n-ok">Entregada</th>
+          <th class="n-pend">Pendiente</th>
+          <th class="n-blk">Bloqueada</th>
+          <th class="n-tot">Total</th>
+        </tr></thead>
+        <tbody id="tb-tipo"></tbody>
+      </table>
+    </div>
+    <div class="cuadro">
+      <div class="cuadro-head">Por estado</div>
+      <table>
+        <thead><tr>
+          <th>Estado</th>
+          <th class="n-tot">Cuentas</th>
+          <th class="n-tot">% del total</th>
+        </tr></thead>
+        <tbody id="tb-estado"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- COMENTARIOS E INICIATIVAS -->
+<div class="panel" id="panel-comentarios">
+  <div class="tabla-wrap" style="margin-bottom:16px">
+    <div class="tabla-toolbar">
+      <div class="tabla-titulo">Comentarios e iniciativas por cuenta</div>
+      <button class="add-btn" onclick="addComentario()">+ Agregar</button>
+    </div>
+    <table class="detalle">
+      <thead>
+        <tr>
+          <th style="width:15%">Cuenta</th>
+          <th style="width:10%">Fecha</th>
+          <th style="width:12%">Responsable</th>
+          <th style="width:14%">Tipo</th>
+          <th style="width:49%">Comentario / Iniciativa</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-comentarios"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HISTORIAL -->
+<div class="panel" id="panel-historial">
+  <div class="tabla-wrap" style="padding:8px 24px 16px">
+    <div class="historial" id="historial-list"></div>
+  </div>
+</div>
+
+<script>
+const ESTADOS  = ['En proceso','Entregada','Pendiente','Bloqueada'];
+const PRIOS    = ['🔴 Alta','🟡 Media','🟢 Baja'];
+const TIPOS    = ['Cotización existente','Cotización nueva','Recotización','Revisión interna'];
+const RESPS    = ['Gabriel Frías','Oscar','Adolfo Peña','Equipo Wawa','Anelys León','Por asignar'];
+const BLOQS    = ['No','Sí'];
+
+let data = [
+  {cuenta:'FEMSA',        tipo:'Cotización existente', fecha_sol:'15 Abr 2026', fecha:'Semana 5 Mayo', resp:'Gabriel Frías', estado:'En proceso', prio:'🔴 Alta',  bloqueo:'No', accion:'Confirmar entrega esta semana', comentario:''},
+  {cuenta:'DAKA',         tipo:'Cotización existente', fecha_sol:'22 Abr 2026', fecha:'Por definir',   resp:'Oscar',         estado:'En proceso', prio:'🔴 Alta',  bloqueo:'Sí', accion:'Enviar 8 sucursales cotizadas. Completar 5 restantes', comentario:'Cliente cotizó 13 sucursales. 8 listas, 5 pendientes.'},
+  {cuenta:'SHELL',        tipo:'Cotización existente', fecha_sol:'10 Abr 2026', fecha:'15 Mayo',       resp:'Anelys León',   estado:'Bloqueada',  prio:'🔴 Alta',  bloqueo:'Sí', accion:'Activar campaña Wawa Partners. Valencia: recotizar.', comentario:'Bloqueo por falta de flota. Maracaibo, Barcelona, Guayana y Valencia.'},
+  {cuenta:'CMDT',         tipo:'Cotización existente', fecha_sol:'28 Abr 2026', fecha:'6 Mayo',        resp:'Gabriel Frías', estado:'En proceso', prio:'🔴 Alta',  bloqueo:'No', accion:'Confirmar entrega el 6 de mayo', comentario:''},
+  {cuenta:'GAMA',         tipo:'Cotización existente', fecha_sol:'25 Abr 2026', fecha:'12 Mayo',       resp:'Adolfo Peña',   estado:'En proceso', prio:'🟡 Media', bloqueo:'No', accion:'Seguimiento para garantizar entrega a tiempo', comentario:''},
+  {cuenta:'MONSERRATINA', tipo:'Recotización',          fecha_sol:'01 Abr 2026', fecha:'5 de Mayo',     resp:'Equipo Wawa',   estado:'Entregada',  prio:'🟢 Baja',  bloqueo:'No', accion:'—', comentario:'Cotización lista y entregada.'},
+  {cuenta:'PLUMROSE',     tipo:'Cotización existente', fecha_sol:'01 Abr 2026', fecha:'5 de Mayo',     resp:'Equipo Wawa',   estado:'Entregada',  prio:'🟢 Baja',  bloqueo:'No', accion:'—', comentario:'Cotización lista y entregada.'},
+  {cuenta:'NETUNO',       tipo:'Cotización nueva',     fecha_sol:'29 Abr 2026', fecha:'Por definir',   resp:'Gabriel Frías', estado:'Pendiente',  prio:'🟡 Media', bloqueo:'No', accion:'Definir fecha de entrega', comentario:''},
+  {cuenta:'LA PASTOREÑA', tipo:'Cotización nueva',     fecha_sol:'29 Abr 2026', fecha:'Por definir',   resp:'Gabriel Frías', estado:'Pendiente',  prio:'🟡 Media', bloqueo:'No', accion:'Definir fecha de entrega', comentario:''},
+  {cuenta:'TÍO RICO',     tipo:'Recotización',          fecha_sol:'02 Abr 2026', fecha:'6 Junio',       resp:'Gabriel Frías', estado:'En proceso', prio:'🟡 Media', bloqueo:'No', accion:'Seguimiento mensual. Revisión semana 3 Mayo', comentario:'Recotización. Fecha de entrega: 6 de junio.'},
+];
+
+let historial = [
+  {fecha:'05/05/2026', cuenta:'FEMSA',        resp:'Gabriel Frías', cambio:'Confirmación de entrega',    detalle:'Entrega comprometida para la semana del 5 de mayo'},
+  {fecha:'05/05/2026', cuenta:'DAKA',         resp:'Oscar',         cambio:'Actualización de estado',    detalle:'8 sucursales cotizadas de 13. Pendiente completar 5.'},
+  {fecha:'05/05/2026', cuenta:'SHELL',        resp:'Anelys León',   cambio:'Bloqueo identificado',       detalle:'Falta de flota en Maracaibo, Barcelona, Guayana. Valencia a recotizar.'},
+  {fecha:'05/05/2026', cuenta:'CMDT',         resp:'Gabriel Frías', cambio:'Fecha de entrega confirmada',detalle:'Entrega el 6 de mayo'},
+  {fecha:'05/05/2026', cuenta:'GAMA',         resp:'Adolfo Peña',   cambio:'Asignación y fecha',         detalle:'Fecha de entrega: 12 de mayo'},
+  {fecha:'05/05/2026', cuenta:'MONSERRATINA', resp:'Equipo Wawa',   cambio:'Cotización entregada',       detalle:'Lista'},
+  {fecha:'05/05/2026', cuenta:'PLUMROSE',     resp:'Equipo Wawa',   cambio:'Cotización entregada',       detalle:'Lista'},
+  {fecha:'05/05/2026', cuenta:'TÍO RICO',     resp:'Gabriel Frías', cambio:'Recotización iniciada',      detalle:'Fecha: 6 de junio'},
+];
+
+let filtroActivo = 'todos';
+
+function estadoBadge(e) {
+  const m = {'En proceso':'b-ep','Entregada':'b-ok','Pendiente':'b-pend','Bloqueada':'b-blk'};
+  return `<span class="badge ${m[e]||'b-ep'}">${e}</span>`;
+}
+function prioBadge(p) {
+  const m = {'🔴 Alta':'b-alta','🟡 Media':'b-media','🟢 Baja':'b-baja'};
+  return `<span class="badge ${m[p]||''}">${p}</span>`;
+}
+function sel(opts, val, field, idx) {
+  return `<select class="inline-sel" onchange="update(${idx},'${field}',this.value)">${opts.map(o=>`<option${o===val?' selected':''}>${o}</option>`).join('')}</select>`;
+}
+
+function renderDetalle() {
+  const filtered = filtroActivo === 'todos' ? data : data.filter(d => d.estado === filtroActivo);
+  document.getElementById('tbody-detalle').innerHTML = filtered.map((d, ii) => {
+    const i = data.indexOf(d);
+    return `<tr>
+      <td><span class="cuenta-name" contenteditable="true" onblur="update(${i},'cuenta',this.textContent.trim())">${d.cuenta}</span></td>
+      <td><span class="tipo-tag">${d.tipo}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple-mid);font-weight:500;white-space:nowrap" contenteditable="true" onblur="update(${i},'fecha_sol',this.textContent.trim())">${d.fecha_sol||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--gray-text)" contenteditable="true" onblur="update(${i},'fecha',this.textContent.trim())">${d.fecha}</td>
+      <td style="font-size:12px;font-weight:500">${sel(RESPS, d.resp, 'resp', i)}</td>
+      <td>${sel(ESTADOS, d.estado, 'estado', i)}</td>
+      <td>${sel(PRIOS, d.prio, 'prio', i)}</td>
+      <td style="text-align:center">${sel(BLOQS, d.bloqueo, 'bloqueo', i)}</td>
+      <td><span class="accion-text" contenteditable="true" onblur="update(${i},'accion',this.textContent.trim())">${d.accion}</span></td>
+      <td><span class="accion-text" style="color:var(--purple-mid)" contenteditable="true" onblur="update(${i},'comentario',this.textContent.trim())">${d.comentario||'—'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderKPIs() {
+  document.getElementById('k-total').textContent = data.length;
+  document.getElementById('k-ok').textContent    = data.filter(d=>d.estado==='Entregada').length;
+  document.getElementById('k-blk').textContent   = data.filter(d=>d.bloqueo==='Sí').length;
+  document.getElementById('k-pend').textContent  = data.filter(d=>d.estado==='Pendiente').length;
+}
+
+function countBy(field, val, est) {
+  return data.filter(d=>d[field]===val && d.estado===est).length;
+}
+
+function cuadroRows(field, vals) {
+  const rows = vals.map(v => {
+    const ep=countBy(field,v,'En proceso'), ok=countBy(field,v,'Entregada'),
+          pend=countBy(field,v,'Pendiente'), blk=countBy(field,v,'Bloqueada');
+    const tot = ep+ok+pend+blk;
+    if(!tot) return '';
+    return `<tr>
+      <td>${v}</td>
+      <td class="n-ep">${ep||'·'}</td>
+      <td class="n-ok">${ok||'·'}</td>
+      <td class="n-pend">${pend||'·'}</td>
+      <td class="n-blk">${blk||'·'}</td>
+      <td class="n-tot">${tot}</td>
+    </tr>`;
+  }).join('');
+  const tEP=data.filter(d=>d.estado==='En proceso').length,
+        tOK=data.filter(d=>d.estado==='Entregada').length,
+        tPend=data.filter(d=>d.estado==='Pendiente').length,
+        tBlk=data.filter(d=>d.estado==='Bloqueada').length;
+  return rows + `<tr><td>Total</td><td>${tEP}</td><td>${tOK}</td><td>${tPend}</td><td>${tBlk}</td><td>${data.length}</td></tr>`;
+}
+
+function renderCuadros() {
+  const RESPS_CUADRO = RESPS.filter(r => r !== 'Oscar');
+  document.getElementById('tb-resp').innerHTML  = cuadroRows('resp', RESPS_CUADRO);
+  document.getElementById('tb-prio').innerHTML  = cuadroRows('prio', PRIOS);
+  document.getElementById('tb-tipo').innerHTML  = cuadroRows('tipo', TIPOS);
+  const estadoRows = ESTADOS.map(e => {
+    const n = data.filter(d=>d.estado===e).length;
+    if(!n) return '';
+    const pct = Math.round(n/data.length*100);
+    const bar = `<span style="display:inline-block;width:${pct}%;max-width:80px;height:4px;border-radius:2px;background:var(--purple);vertical-align:middle;margin-right:4px"></span>`;
+    return `<tr><td>${estadoBadge(e)}</td><td class="n-tot">${n}</td><td style="color:var(--gray-text)">${bar}${pct}%</td></tr>`;
+  }).join('');
+  document.getElementById('tb-estado').innerHTML = estadoRows + `<tr><td style="font-weight:600">Total</td><td class="n-tot">${data.length}</td><td style="color:var(--gray-text)">100%</td></tr>`;
+}
+
+let comentarios = [
+  {cuenta:'SHELL',   fecha:'05/05/2026', resp:'Anelys León',   tipo:'Bloqueo',     texto:'Bloqueo por falta de flota en Maracaibo, Barcelona, Guayana y Valencia. Se activará campaña de Wawa Partners para búsqueda de flota.'},
+  {cuenta:'SHELL',   fecha:'05/05/2026', resp:'Anelys León',   tipo:'Iniciativa',  texto:'Iniciativa: campaña de campo para activación de nuevos socios en ciudades bloqueadas. Coordinación con POD Wawa Partners.'},
+  {cuenta:'DAKA',    fecha:'05/05/2026', resp:'Oscar',         tipo:'Seguimiento', texto:'Cliente cotizó 13 sucursales. 8 ya están cotizadas. Oscar enviará al cliente las sucursales disponibles esta semana. Restan 5 por cotizar.'},
+  {cuenta:'FEMSA',   fecha:'05/05/2026', resp:'Gabriel Frías', tipo:'Seguimiento', texto:'Entrega comprometida para la semana del 5 de mayo. Documento en revisión final.'},
+  {cuenta:'CMDT',    fecha:'05/05/2026', resp:'Gabriel Frías', tipo:'Seguimiento', texto:'Fecha límite 6 de mayo. Sin margen de postergación. Prioridad máxima esta semana.'},
+  {cuenta:'TÍO RICO',fecha:'05/05/2026', resp:'Gabriel Frías', tipo:'Info',        texto:'Recotización con fecha de entrega 6 de junio. Revisión mensual programada semana 3 de mayo.'},
+];
+
+const TIPOS_COM = ['Iniciativa','Bloqueo','Seguimiento','Info'];
+
+function renderComentarios() {
+  const tcMap = {Iniciativa:'tc-iniciativa', Bloqueo:'tc-bloqueo', Seguimiento:'tc-seguimiento', Info:'tc-info'};
+  document.getElementById('tbody-comentarios').innerHTML = comentarios.map((c,i) => `
+    <tr>
+      <td><span style="font-weight:600;font-size:13px">${c.cuenta}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gray-text)">${c.fecha}</td>
+      <td style="font-size:12px;font-weight:500;color:var(--purple-mid)">${c.resp}</td>
+      <td><span class="tipo-com ${tcMap[c.tipo]||'tc-info'}">${c.tipo}</span></td>
+      <td><span class="accion-text" contenteditable="true" onblur="comentarios[${i}].texto=this.textContent.trim()">${c.texto}</span></td>
+    </tr>`).join('');
+}
+
+function addComentario() {
+  const hoy = new Date().toLocaleDateString('es-VE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  comentarios.push({cuenta:'',fecha:hoy,resp:'',tipo:'Info',texto:'Escribe aquí el comentario o iniciativa...'});
+  renderComentarios();
+}
+
+function renderHistorial() {
+  document.getElementById('historial-list').innerHTML = [...historial].reverse().map(h => `
+    <div class="hist-item">
+      <div class="hist-fecha">${h.fecha}</div>
+      <div class="hist-dot"></div>
+      <div>
+        <div class="hist-cuenta">${h.cuenta}</div>
+        <div class="hist-cambio">${h.cambio}</div>
+        <div class="hist-detalle">${h.detalle} — <em>${h.resp}</em></div>
+      </div>
+    </div>`).join('');
+}
+
+function render() { renderKPIs(); renderCuadros(); renderDetalle(); renderHistorial(); renderComentarios(); }
+
+function update(idx, field, val) {
+  const old = data[idx][field];
+  data[idx][field] = val;
+  if(field === 'estado' || field === 'bloqueo' || field === 'resp' || field === 'prio') {
+    const hoy = new Date().toLocaleDateString('es-VE',{day:'2-digit',month:'2-digit',year:'numeric'});
+    historial.push({fecha:hoy, cuenta:data[idx].cuenta, resp:data[idx].resp, cambio:`Cambio: ${field}`, detalle:`${old} → ${val}`});
+    renderHistorial();
+  }
+  renderKPIs();
+  renderCuadros();
+  if(field !== 'cuenta' && field !== 'fecha' && field !== 'accion') renderDetalle();
+}
+
+function filtrar(estado, btn) {
+  filtroActivo = estado;
+  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDetalle();
+}
+
+function addRow() {
+  const hoy = new Date().toLocaleDateString('es-VE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  data.push({cuenta:'Nueva cuenta', tipo:'Cotización nueva', fecha_sol:new Date().toLocaleDateString('es-VE',{day:'2-digit',month:'short',year:'numeric'}), fecha:'Por definir', resp:'Por asignar', estado:'Pendiente', prio:'🟡 Media', bloqueo:'No', accion:'', comentario:''});
+  historial.push({fecha:hoy, cuenta:'Nueva cuenta', resp:'—', cambio:'Cuenta agregada', detalle:'Nueva cotización creada'});
+  render();
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+render();
+</script>
+</body>
+</html>
